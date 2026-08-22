@@ -1,0 +1,22 @@
+[project]
+name = "Vigilare_Gufo"
+version = "0.0.1"
+description = ""
+authors = [
+    {name = "Matheus",email = "matheusamaralmoraes06@gmai.com"}
+]
+
+requires-python = ">=3.14"
+
+dependencies = [
+]
+
+[dependency-groups]
+dev = [
+    "pytest (>=9.1.1,<10.0.0)",
+    "ruff (>=0.16.4,<0.17.0)"
+]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
