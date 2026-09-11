@@ -1,0 +1,7 @@
+Reorganização inicial do Vigilare-Gufo.
+
+Removidos: scan.py, scanbkp.py e arquivos github_pat_* encontrados no ZIP.
+Movidos: Poetry para a raiz; código do servidor para server/vigilare/; scripts para scripts/.
+Criados: estrutura inicial de core/network/security/services, tests e docs.
+
+ATENÇÃO: se um PAT real já foi commitado no Git antes desta reorganização, ele deve ser revogado no GitHub; removê-lo do arquivo atual não apaga o histórico.
