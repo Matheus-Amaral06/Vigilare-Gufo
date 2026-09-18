@@ -7,6 +7,9 @@ from vigilare.utils.system import (
 
 
 def bridge_existe(nome):
+    """
+    Verifica se uma bridge/interface existe no sistema.
+    """
     resultado = executar_comando_seguro([
         "ip",
         "link",
@@ -18,8 +21,20 @@ def bridge_existe(nome):
 
 
 def criar_bridge(nome):
+    """
+    Cria uma bridge caso ela ainda não exista.
+
+    Retorna:
+        dict:
+            nome: nome da bridge
+            criada: True se foi criada agora,
+                    False se já existia.
+    """
     if bridge_existe(nome):
-        return nome
+        return {
+            "nome": nome,
+            "criada": False,
+        }
 
     executar_comando([
         "sudo",
@@ -31,10 +46,16 @@ def criar_bridge(nome):
         "bridge",
     ])
 
-    return nome
+    return {
+        "nome": nome,
+        "criada": True,
+    }
 
 
 def ativar_bridge(nome):
+    """
+    Ativa uma bridge existente.
+    """
     if not bridge_existe(nome):
         raise ValueError(
             f"A bridge '{nome}' nao existe."
@@ -51,6 +72,13 @@ def ativar_bridge(nome):
 
 
 def configurar_gateway(nome_bridge, subrede):
+    """
+    Configura o primeiro endereço utilizável da sub-rede
+    como gateway da bridge.
+
+    Remove outros endereços IPv4 da bridge antes de
+    configurar o gateway correto.
+    """
     if not bridge_existe(nome_bridge):
         raise ValueError(
             f"A bridge '{nome_bridge}' nao existe."
@@ -75,7 +103,9 @@ def configurar_gateway(nome_bridge, subrede):
         nome_bridge,
     ])
 
-    endereco_gateway = f"{gateway}/{subrede.prefixlen}"
+    endereco_gateway = (
+        f"{gateway}/{subrede.prefixlen}"
+    )
 
     enderecos_atuais = []
 
@@ -113,8 +143,13 @@ def configurar_gateway(nome_bridge, subrede):
 
 
 def remover_bridge(nome):
+    """
+    Remove uma bridge existente.
+
+    Se a bridge não existir, nenhuma ação é realizada.
+    """
     if not bridge_existe(nome):
-        return
+        return False
 
     executar_comando([
         "sudo",
@@ -126,12 +161,21 @@ def remover_bridge(nome):
         "bridge",
     ])
 
+    return True
+
 
 def criar_bridge_quarentena(
     nome="gufo-br0",
     subrede=None,
 ):
-    criar_bridge(nome)
+    """
+    Cria e ativa a bridge de uma quarentena.
+
+    Retorna informações sobre a infraestrutura criada,
+    incluindo se a bridge foi criada durante esta operação.
+    """
+    resultado_bridge = criar_bridge(nome)
+
     ativar_bridge(nome)
 
     gateway = None
@@ -144,6 +188,7 @@ def criar_bridge_quarentena(
 
     return {
         "bridge": nome,
+        "bridge_criada": resultado_bridge["criada"],
         "gateway": (
             str(gateway)
             if gateway is not None
