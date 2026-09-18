@@ -1,7 +1,7 @@
 [project]
 name = "Vigilare_Gufo"
 version = "0.0.1"
-description = ""
+description = "Gerenciador de redes de quarentena"
 authors = [
     {name = "Matheus", email = "matheusamaralmoraes06@gmai.com"}
 ]
@@ -16,6 +16,9 @@ dependencies = [
 packages = [
     { include = "vigilare", from = "server" }
 ]
+
+[tool.poetry.scripts]
+vigilare = "vigilare.main:main"
 
 [dependency-groups]
 dev = [
