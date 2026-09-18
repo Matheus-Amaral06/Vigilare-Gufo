@@ -85,16 +85,45 @@ def validar_interface(interface):
         )
 
 
-def obter_redes_existentes(interface):
-    """
-    Obtem as redes IPv4 atualmente configuradas
-    em uma interface.
-    """
+def obter_interface_saida_padrao(destino="1.1.1.1"):
+    resultado = executar_comando([
+        "ip",
+        "route",
+        "get",
+        destino,
+    ])
+
+    partes = resultado.stdout.split()
+
+    if "dev" not in partes:
+        raise RuntimeError(
+            "Nao foi possivel identificar a interface de saida."
+        )
+
+    indice_dev = partes.index("dev")
+
+    if indice_dev + 1 >= len(partes):
+        raise RuntimeError(
+            "A rota nao informou uma interface de saida."
+        )
+
+    interface = partes[indice_dev + 1]
+
     validar_interface(interface)
 
-    resultado = executar_comando(
-        ["ip", "-4", "addr", "show", interface]
-    )
+    return interface
+
+
+def obter_redes_existentes(interface):
+    validar_interface(interface)
+
+    resultado = executar_comando([
+        "ip",
+        "-4",
+        "addr",
+        "show",
+        interface,
+    ])
 
     redes = []
 
@@ -103,21 +132,13 @@ def obter_redes_existentes(interface):
 
         if linha.startswith("inet "):
             ip_cidr = linha.split()[1]
-
-            rede = ipaddress.ip_interface(
-                ip_cidr
-            ).network
-
+            rede = ipaddress.ip_interface(ip_cidr).network
             redes.append(rede)
 
     return redes
 
 
 def obter_todas_redes_existentes():
-    """
-    Obtem todas as redes IPv4 atualmente configuradas
-    nas interfaces do sistema.
-    """
     interfaces = get_interfaces()
 
     todas_interfaces = (

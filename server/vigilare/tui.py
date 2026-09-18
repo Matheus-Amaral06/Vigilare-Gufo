@@ -9,7 +9,7 @@ from vigilare.core.application import (
     testar_quarentena,
 )
 from vigilare.core.quarantine import montar_configuracao
-from vigilare.network.interfaces import get_interfaces
+from vigilare.network.interfaces import obter_interface_saida_padrao
 from vigilare.utils.storage import carregar_json, salvar_json
 
 
@@ -59,14 +59,7 @@ def cabecalho(titulo):
 
 
 def escolher_interface_saida():
-    interfaces = get_interfaces()
-
-    if not interfaces["ethernet"]:
-        raise RuntimeError(
-            "Nenhuma interface Ethernet encontrada."
-        )
-
-    return interfaces["ethernet"][0]
+    return obter_interface_saida_padrao()
 
 
 def perguntar_nome():
